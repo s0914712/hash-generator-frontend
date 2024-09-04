@@ -1,13 +1,88 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+
+const PhotoUpload = () => {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [description, setDescription] = useState('');
+  const [previewUrl, setPreviewUrl] = useState('');
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewUrl('');
+    }
+  };
+
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Here you would typically send the file and description to a server
+    console.log('File:', selectedFile);
+    console.log('Description:', description);
+    // Reset form after submission
+    setSelectedFile(null);
+    setDescription('');
+    setPreviewUrl('');
+  };
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <h2 className="text-2xl font-bold">Upload Photo</h2>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="photo">Choose a photo</Label>
+              <Input
+                id="photo"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="mt-1"
+              />
+            </div>
+            {previewUrl && (
+              <div className="mt-4">
+                <img src={previewUrl} alt="Preview" className="max-w-full h-auto" />
+              </div>
+            )}
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={handleDescriptionChange}
+                placeholder="Enter a description for your photo"
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter>
+        <Button type="submit" onClick={handleSubmit} className="w-full">
+          Upload
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};
+
+export default PhotoUpload;
